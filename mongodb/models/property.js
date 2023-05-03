@@ -6,6 +6,7 @@ const PropertySchema = new Schema({
     propertyType:{type:String,required:true},
     location:{type:String,required:true},
     price:{type:Number,required:true},
+    photo:{type:String},
     creator:{type:Schema.Types.ObjectId,ref:"User"},
 })
 
