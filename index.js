@@ -4,7 +4,7 @@ import { port, mongodbUrl } from './enviroment.js';
 import connect from './mongodb/connect.js';
 import { userRoutes,propertyRoutes }from './routes.js';
 
-export const server = fastify({ logger: true });
+export const server = fastify({ logger: true,bodyLimit:2048576  });
 
 await server.register(cors, {})
 server.register(userRoutes,{prefix:'/api/v1/users'})

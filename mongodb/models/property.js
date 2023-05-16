@@ -7,6 +7,7 @@ const PropertySchema = new Schema({
     location:{type:String,required:true},
     price:{type:Number,required:true},
     photo:{type:String},
+    photoId:{type:String},
     creator:{type:Schema.Types.ObjectId,ref:"User"},
 })
 
