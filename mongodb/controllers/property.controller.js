@@ -82,7 +82,7 @@ const createProperty = async (req, res) => {
       description,
       location,
       photo: photoUrl.url,
-      photoId:photoUrl.public_id,
+      photoId: photoUrl.public_id,
       creator: user._id,
     });
     user.allProperties.push(newProperty._id);
@@ -93,26 +93,50 @@ const createProperty = async (req, res) => {
     res.status(500).send(error);
   }
 };
-const updateProperty = async (req, res) => {};
+const updateProperty = async (req, res) => {
+  try {
+    const { id } = req.params;
+    console.log(req)
+    const { title, description, price, location, photo, propertyType, email } =
+      req.body;
+    const photoUrl = (await cloudinary.uploader.upload(photo)).url;
+    await PropertyModel.findByIdAndUpdate(
+      { _id: id },
+      {
+        title,
+        description,
+        price,
+        location,
+        photo: photoUrl || photo,
+        photoId: photoUrl.public_id,
+        propertyType,
+        email,
+      }
+    );
+    res.status(200).send("Property updated");
+  } catch (error) {
+    res.status(500).send(error);
+  }
+};
 const deleteProperty = async (req, res) => {
   try {
     const { id } = req.params;
     const propertyToDelete = await PropertyModel.findOne({ _id: id }).populate(
       "creator"
     );
-    if(!propertyToDelete) throw new Error("Property not found");
-    const session =await mongoose.startSession();
+    if (!propertyToDelete) throw new Error("Property not found");
+    const session = await mongoose.startSession();
     session.startTransaction();
-    cloudinary.uploader.destroy(propertyToDelete.photoId).then(()=>console.log('deleted'));
-    propertyToDelete.deleteOne({session});
+    cloudinary.uploader
+      .destroy(propertyToDelete.photoId)
+      .then(() => console.log("deleted"));
+    propertyToDelete.deleteOne({ session });
     propertyToDelete.creator.allProperties.pull(propertyToDelete);
-    await propertyToDelete.creator.save({session});
+    await propertyToDelete.creator.save({ session });
     await session.commitTransaction();
-    res.status(200).send({message:'Property delete successfully'})
-
-
+    res.status(200).send({ message: "Property delete successfully" });
   } catch (error) {
-    res.status(500).send(error)
+    res.status(500).send(error);
   }
 };
 
